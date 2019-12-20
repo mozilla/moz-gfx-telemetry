@@ -1,1 +1,4 @@
 www/data/*.json
+dist/
+build/
+*.egg-info
