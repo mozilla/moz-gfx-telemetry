@@ -25,6 +25,10 @@ def fetch_results(
         channel_filter = "normalized_channel = '{}' AND".format(channel)
 
     query = """
+    CREATE TEMP FUNCTION keyed_hist_to_json(h ANY TYPE) AS (
+        ARRAY(SELECT AS STRUCT key, mozfun.hist.string_to_json(value) AS value FROM UNNEST(h))
+    );
+
     WITH sample AS
     (select client_id,
         creation_date,
@@ -43,30 +47,30 @@ def fetch_results(
         environment.system.gfx.monitors                                           as environment__system__gfx__monitors,
         environment.build.architecture                                            as environment__build__architecture,
         environment.system.gfx.features                                           as environment__system__gfx__features,
-        payload.histograms.DEVICE_RESET_REASON                                    as payload__histograms__DEVICE_RESET_REASON,
-        payload.histograms.GRAPHICS_SANITY_TEST                                   as payload__histograms__GRAPHICS_SANITY_TEST,
-        payload.histograms.GRAPHICS_SANITY_TEST_REASON                            as payload__histograms__GRAPHICS_SANITY_TEST_REASON,
-        payload.histograms.GRAPHICS_DRIVER_STARTUP_TEST                           as payload__histograms__GRAPHICS_DRIVER_STARTUP_TEST,
-        payload.histograms.CANVAS_WEBGL_SUCCESS                                   as payload__histograms__CANVAS_WEBGL_SUCCESS,
-        payload.histograms.CANVAS_WEBGL2_SUCCESS                                  as payload__histograms__CANVAS_WEBGL2_SUCCESS,
-        payload.histograms.PLUGIN_DRAWING_MODEL                                   as payload__histograms__PLUGIN_DRAWING_MODEL,
-        payload.histograms.MEDIA_DECODER_BACKEND_USED                             as payload__histograms__MEDIA_DECODER_BACKEND_USED,
-        payload.processes.content.histograms.DEVICE_RESET_REASON                  as payload__processes__content__histograms__DEVICE_RESET_REASON,
-        payload.processes.content.histograms.GRAPHICS_SANITY_TEST                 as payload__processes__content__histograms__GRAPHICS_SANITY_TEST,
-        payload.processes.content.histograms.GRAPHICS_SANITY_TEST_REASON          as payload__processes__content__histograms__GRAPHICS_SANITY_TEST_REASON,
-        payload.processes.content.histograms.GRAPHICS_DRIVER_STARTUP_TEST         as payload__processes__content__histograms__GRAPHICS_DRIVER_STARTUP_TEST,
-        payload.processes.content.histograms.CANVAS_WEBGL_SUCCESS                 as payload__processes__content__histograms__CANVAS_WEBGL_SUCCESS,
-        payload.processes.content.histograms.CANVAS_WEBGL2_SUCCESS                as payload__processes__content__histograms__CANVAS_WEBGL2_SUCCESS,
-        payload.processes.content.histograms.PLUGIN_DRAWING_MODEL                 as payload__processes__content__histograms__PLUGIN_DRAWING_MODEL,
-        payload.processes.content.histograms.MEDIA_DECODER_BACKEND_USED           as payload__processes__content__histograms__MEDIA_DECODER_BACKEND_USED,
-        payload.keyed_histograms.D3D11_COMPOSITING_FAILURE_ID                     as payload__keyed_histograms__D3D11_COMPOSITING_FAILURE_ID,
-        payload.keyed_histograms.OPENGL_COMPOSITING_FAILURE_ID                    as payload__keyed_histograms__OPENGL_COMPOSITING_FAILURE_ID,
-        payload.keyed_histograms.CANVAS_WEBGL_ACCL_FAILURE_ID                     as payload__keyed_histograms__CANVAS_WEBGL_ACCL_FAILURE_ID,
-        payload.keyed_histograms.CANVAS_WEBGL_FAILURE_ID                          as payload__keyed_histograms__CANVAS_WEBGL_FAILURE_ID,
-        payload.processes.content.keyed_histograms.D3D11_COMPOSITING_FAILURE_ID   as payload__processes__content__keyed_histograms__D3D11_COMPOSITING_FAILURE_ID,
-        payload.processes.content.keyed_histograms.OPENGL_COMPOSITING_FAILURE_ID  as payload__processes__content__keyed_histograms__OPENGL_COMPOSITING_FAILURE_ID,
-        payload.processes.content.keyed_histograms.CANVAS_WEBGL_ACCL_FAILURE_ID   as payload__processes__content__keyed_histograms__CANVAS_WEBGL_ACCL_FAILURE_ID,
-        payload.processes.content.keyed_histograms.CANVAS_WEBGL_FAILURE_ID        as payload__processes__content__keyed_histograms__CANVAS_WEBGL_FAILURE_ID
+        mozfun.hist.string_to_json(payload.histograms.DEVICE_RESET_REASON)                                    as payload__histograms__DEVICE_RESET_REASON,
+        mozfun.hist.string_to_json(payload.histograms.GRAPHICS_SANITY_TEST)                                   as payload__histograms__GRAPHICS_SANITY_TEST,
+        mozfun.hist.string_to_json(payload.histograms.GRAPHICS_SANITY_TEST_REASON)                            as payload__histograms__GRAPHICS_SANITY_TEST_REASON,
+        mozfun.hist.string_to_json(payload.histograms.GRAPHICS_DRIVER_STARTUP_TEST)                           as payload__histograms__GRAPHICS_DRIVER_STARTUP_TEST,
+        mozfun.hist.string_to_json(payload.histograms.CANVAS_WEBGL_SUCCESS)                                   as payload__histograms__CANVAS_WEBGL_SUCCESS,
+        mozfun.hist.string_to_json(payload.histograms.CANVAS_WEBGL2_SUCCESS)                                  as payload__histograms__CANVAS_WEBGL2_SUCCESS,
+        mozfun.hist.string_to_json(payload.histograms.PLUGIN_DRAWING_MODEL)                                   as payload__histograms__PLUGIN_DRAWING_MODEL,
+        mozfun.hist.string_to_json(payload.histograms.MEDIA_DECODER_BACKEND_USED)                             as payload__histograms__MEDIA_DECODER_BACKEND_USED,
+        mozfun.hist.string_to_json(payload.processes.content.histograms.DEVICE_RESET_REASON)                  as payload__processes__content__histograms__DEVICE_RESET_REASON,
+        mozfun.hist.string_to_json(payload.processes.content.histograms.GRAPHICS_SANITY_TEST)                 as payload__processes__content__histograms__GRAPHICS_SANITY_TEST,
+        mozfun.hist.string_to_json(payload.processes.content.histograms.GRAPHICS_SANITY_TEST_REASON)          as payload__processes__content__histograms__GRAPHICS_SANITY_TEST_REASON,
+        mozfun.hist.string_to_json(payload.processes.content.histograms.GRAPHICS_DRIVER_STARTUP_TEST)         as payload__processes__content__histograms__GRAPHICS_DRIVER_STARTUP_TEST,
+        mozfun.hist.string_to_json(payload.processes.content.histograms.CANVAS_WEBGL_SUCCESS)                 as payload__processes__content__histograms__CANVAS_WEBGL_SUCCESS,
+        mozfun.hist.string_to_json(payload.processes.content.histograms.CANVAS_WEBGL2_SUCCESS)                as payload__processes__content__histograms__CANVAS_WEBGL2_SUCCESS,
+        mozfun.hist.string_to_json(payload.processes.content.histograms.PLUGIN_DRAWING_MODEL)                 as payload__processes__content__histograms__PLUGIN_DRAWING_MODEL,
+        mozfun.hist.string_to_json(payload.processes.content.histograms.MEDIA_DECODER_BACKEND_USED)           as payload__processes__content__histograms__MEDIA_DECODER_BACKEND_USED,
+        keyed_hist_to_json(payload.keyed_histograms.D3D11_COMPOSITING_FAILURE_ID)                     as payload__keyed_histograms__D3D11_COMPOSITING_FAILURE_ID,
+        keyed_hist_to_json(payload.keyed_histograms.OPENGL_COMPOSITING_FAILURE_ID)                    as payload__keyed_histograms__OPENGL_COMPOSITING_FAILURE_ID,
+        keyed_hist_to_json(payload.keyed_histograms.CANVAS_WEBGL_ACCL_FAILURE_ID)                     as payload__keyed_histograms__CANVAS_WEBGL_ACCL_FAILURE_ID,
+        keyed_hist_to_json(payload.keyed_histograms.CANVAS_WEBGL_FAILURE_ID)                          as payload__keyed_histograms__CANVAS_WEBGL_FAILURE_ID,
+        keyed_hist_to_json(payload.processes.content.keyed_histograms.D3D11_COMPOSITING_FAILURE_ID)   as payload__processes__content__keyed_histograms__D3D11_COMPOSITING_FAILURE_ID,
+        keyed_hist_to_json(payload.processes.content.keyed_histograms.OPENGL_COMPOSITING_FAILURE_ID)  as payload__processes__content__keyed_histograms__OPENGL_COMPOSITING_FAILURE_ID,
+        keyed_hist_to_json(payload.processes.content.keyed_histograms.CANVAS_WEBGL_ACCL_FAILURE_ID)   as payload__processes__content__keyed_histograms__CANVAS_WEBGL_ACCL_FAILURE_ID,
+        keyed_hist_to_json(payload.processes.content.keyed_histograms.CANVAS_WEBGL_FAILURE_ID)        as payload__processes__content__keyed_histograms__CANVAS_WEBGL_FAILURE_ID
         from `moz-fx-data-shared-prod.telemetry_stable.main_v4` where
         date(submission_timestamp) >= '{start_date}' AND date(submission_timestamp) <= '{end_date}' AND
         normalized_app_name = 'Firefox' AND
