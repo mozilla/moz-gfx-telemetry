@@ -16,8 +16,8 @@ def fetch_results(
     end_date,
     channel=None,
     min_firefox_version="53",
-    project_id="moz-fx-data-shared-prod",
-    dataset_id="analysis",
+    project_id="mozdata",
+    dataset_id="tmp",
     table_id="graphics_telemetry_dashboard_tmp",
 ):
     channel_filter = ""
@@ -101,7 +101,7 @@ def fetch_results(
         min_firefox_version=min_firefox_version,
     )
 
-    bq = bigquery.Client()
+    bq = bigquery.Client(project=project_id)
     table_ref = bq.dataset(dataset_id, project=project_id).table(table_id)
     job_config = bigquery.QueryJobConfig()
     job_config.destination = table_ref

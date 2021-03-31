@@ -18,8 +18,8 @@ def fetch_results(
     spark,
     start_date,
     end_date,
-    project_id="moz-fx-data-shared-prod",
-    dataset_id="analysis",
+    project_id="mozdata",
+    dataset_id="tmp",
     table_id="graphics_telemetry_trends_tmp",
 ):
     query = """
@@ -43,7 +43,7 @@ def fetch_results(
         start_date.strftime(FORMAT_DS), end_date.strftime(FORMAT_DS)
     )
 
-    bq = bigquery.Client()
+    bq = bigquery.Client(project=project_id)
     # We need to explicitly specify destination table since the query result is smaller than 10MB, otherwise we could omit next 4 lines
     table_ref = bq.dataset(dataset_id, project=project_id).table(table_id)
     job_config = bigquery.QueryJobConfig()
