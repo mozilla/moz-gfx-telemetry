@@ -840,7 +840,7 @@ ChartDisplay.prototype.drawMacStats = function ()
     return 'Unknown';
   }));
 
-  for (var i = 8; i <= 14; i++) {
+  for (var i = 9; i <= 15; i++) {
     var osx_version = '10.' + i;
     var elt = this.prepareChartDiv(
       'osx-' + osx_version,
