@@ -176,7 +176,11 @@ def convert_bigquery_results(f):
                 newdict[first][second] = {}
             if third not in newdict[first][second]:
                 newdict[first][second][third] = {}
+            if fourth not in newdict[first][second][third]:
+                newdict[first][second][third][fourth] = {}
+
             newdict[first][second][third][fourth] = v
+
         elif len(pieces) == 5:
             first, second, third, fourth, fifth = pieces
             if fourth == "histograms" and isinstance(v, str):
