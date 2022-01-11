@@ -122,7 +122,7 @@ def fetch_results(
     )
 
 
-def revert(s):
+def revert(key):
     replacements = {
         "client_id": "clientId",
         "creation_date": "creationDate",
@@ -133,10 +133,10 @@ def revert(s):
         "is_wow64": "isWow64",
         "memory_mb": "memoryMB",
     }
-    if s in replacements:
-        return replacements[s]
-    else:
-        return s
+    if key in replacements:
+        return replacements[key]
+
+    return key  # value needs no transformation
 
 
 def convert_bigquery_results(f):
@@ -146,11 +146,12 @@ def convert_bigquery_results(f):
     # instead, we explicitly add the properties we know we care about at the end of this routine
     additional_properties = json.loads(d.pop("additional_properties") or "{}")
     newdict = {}
+
     for k, v in d.items():
-        pieces = list(map(revert, k.split("__")))
-        # print(pieces)
+        pieces = list(map(revert, k.split("__")))  # list of values such as clientId, buildId
+
         if len(pieces) == 1:
-            newdict[pieces[0]] = v
+            newdict[pieces[0]] = v if v else {}
         elif len(pieces) == 3:
             first, second, third = pieces
             if second == "histograms" and isinstance(v, str):
@@ -167,7 +168,7 @@ def convert_bigquery_results(f):
                 newdict[first] = {}
             if second not in newdict[first]:
                 newdict[first][second] = {}
-            newdict[first][second][third] = v
+            newdict[first][second][third] = v if v else {}
         elif len(pieces) == 4:
             first, second, third, fourth = pieces
             if first not in newdict:
@@ -179,7 +180,7 @@ def convert_bigquery_results(f):
             if fourth not in newdict[first][second][third]:
                 newdict[first][second][third][fourth] = {}
 
-            newdict[first][second][third][fourth] = v
+            newdict[first][second][third][fourth] = v if v else {}
 
         elif len(pieces) == 5:
             first, second, third, fourth, fifth = pieces
@@ -201,7 +202,7 @@ def convert_bigquery_results(f):
                 newdict[first][second][third] = {}
             if fourth not in newdict[first][second][third]:
                 newdict[first][second][third][fourth] = {}
-            newdict[first][second][third][fourth][fifth] = v
+            newdict[first][second][third][fourth][fifth] = v if v else {}
         elif len(pieces) > 5:
             raise (Exception("too many pieces"))
 
